@@ -2,11 +2,11 @@ import os
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'app secret key')
-    
+
     @staticmethod
     def init_app(app):
         pass
-    
+
 class DevelopConfig(Config):
     DEBUG = True
 

@@ -3,17 +3,11 @@ from collections import defaultdict
 import requests
 from bs4 import BeautifulSoup
 
-from flask import render_template, request, session, redirect
-from flask.ext.wtf import Form
-from wtforms.validators import Required, url
-from wtforms import StringField, SubmitField
-from wtforms.fields.html5 import URLField
+from flask import render_template, request, session, redirect, jsonify
+
+from forms import WebPageForm
 
 from . import main
-
-class WebPageForm(Form):
-    url_field = URLField('URL', validators=[Required(), url()])
-    fetch_field = SubmitField('Fetch')
 
 def _get_html_summary(url):
     EMPTY = (None, None)
@@ -32,16 +26,18 @@ def _get_html_summary(url):
 @main.route('/', methods=['GET', 'POST'])
 def index():
     form = WebPageForm()
-    html_source = None
-    summary = {}
-    if form.validate_on_submit(): # Post request with valid form
-        session['url'] = str(form.url_field.data)
-        return redirect('/') # Avoid form resubmission
-    url = session.get('url')
-    if url:
+    return render_template('index.html', form=form)
+
+@main.route('/pagesummary', methods=['POST'])
+def pagesummary():
+    form = WebPageForm()
+    response = {}
+    if form.validate_on_submit():
+        url = str(form.url_field.data)
         html_source, summary = _get_html_summary(url)
-        session.pop('url')
-    return render_template('index.html', form=form, source=html_source, summary=summary)
+        response['source'] = html_source
+        response['summary'] = summary
+    return jsonify(**response)
 
 @main.app_errorhandler(404)
 def not_found(e):
