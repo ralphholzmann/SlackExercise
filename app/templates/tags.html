@@ -1,0 +1,10 @@
+{% macro render_tag(tag_name, tag_count) %}
+<div class="row">
+    <div class="col-sm-4 text-center">
+        <p class="tag-name">{{ tag_name }}</p>
+    </div>
+    <div class="col-sm-4 text-center">
+        <p>{{ tag_count }}</p>
+    </div>
+</div>
+{% endmacro %}
